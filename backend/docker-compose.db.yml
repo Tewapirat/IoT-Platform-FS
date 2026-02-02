@@ -1,0 +1,16 @@
+name: iot-platform-services
+
+services:
+  pf-db:
+    image: mongo
+    container_name: iot-pf-db
+    ports:
+      - "27027:27017"
+  
+  emqx:
+    image: emqx/emqx:latest
+    container_name: emqx-pf
+    ports:
+      - "1883:1883"
+      - "18083:18083"
+      - "8083:8083" 

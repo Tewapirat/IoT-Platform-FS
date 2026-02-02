@@ -13,4 +13,5 @@ export class UpdateUserDto {
     @IsString()
     @IsNotEmpty()
     readonly last_name: string
+
 }

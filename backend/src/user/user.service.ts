@@ -7,6 +7,7 @@ import { HttpException } from "@/common/exceptions/HttpException";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { Document } from "mongoose";
 import { DeleteUserDto } from "./dto/delete-user.dto";
+import { UpdateRoleDto } from "./dto/update-user-role.dto";
 
 @Service()
 export class UserService {
@@ -38,6 +39,16 @@ export class UserService {
         }
         findUser.first_name = updateUser.first_name
         findUser.last_name = updateUser.last_name
+        await findUser.save()
+        return findUser
+    }
+
+    public async updateRole(updateUser: UpdateRoleDto): Promise<User> {
+        const findUser: User & Document = await UserModel.findById(updateUser._id)
+        if (!findUser) {
+            throw new HttpException(404, 'user not found')
+        }
+        findUser.role = updateUser.role
         await findUser.save()
         return findUser
     }

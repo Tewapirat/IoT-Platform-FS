@@ -5,6 +5,7 @@ import { User } from "./interfaces/user.interface";
 import { CreateUserDto } from "./dto/user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { DeleteUserDto } from "./dto/delete-user.dto";
+import { UpdateRoleDto } from "./dto/update-user-role.dto";
 
 @Service()
 export class UserController {
@@ -58,11 +59,23 @@ export class UserController {
         }
     }
 
+    public updateRole = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const updateRole: UpdateRoleDto = { ...req.body }
+            const result = await this.service.updateRole(updateRole)
+            res.status(200).json({ message: "update role", data: result })
+
+        } catch (error) {
+            next(error)
+
+        }
+    }
+
     public delete = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const deleteUser: DeleteUserDto = { ...req.body }
             const result = await this.service.delete(deleteUser)
-            res.status(200).json({ message: "delete" })
+            res.status(200).json({ message: "delete", data: result })
         } catch (error) {
             next(error)
         }

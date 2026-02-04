@@ -12,6 +12,8 @@ import { logger, stream } from '@/common/utils/logger';
 import { dbConnection } from '@/common/database'; 
 import { Routes } from './common/interfaces/routes.interface';
 import { ErrorMiddleware } from '@/common/middlewares/error.middleware';
+import { MqttController } from './mqtt/mqtt.controller';
+
 
 const limiter = rateLimit({
 	windowMs: 1 * 60 * 1000, // 1 minutes
@@ -35,7 +37,8 @@ export class App {
     this.connectToDatabase();
     this.initializeMiddlewares();
     this.initializeRoutes(routes); 
-    this.initializeErrorHandling(); 
+    this.initializeErrorHandling();
+    new MqttController()
   }
 
   public listen() {

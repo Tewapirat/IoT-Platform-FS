@@ -59,16 +59,20 @@ export class MqttController {
         const payload = JSON.parse(message)
         const device: Device & Document = await DeviceModel.findOne({ id: payload.device_id })
         if (device) {
-            if (topics[2] === 'out') {
+            if(topics[2] ==='out'){
                 device.active_date = new Date()
-                device.save()
-                if (payload.all) {
+                if(!device.online_status){
+                    device.online_status = true
+                }
+                if (payload.all){
+                    device.data = payload
                     this.logService.create({
                         device_id: payload.device_id,
                         data: payload,
                         log_date: new Date()
                     })
                 }
+                device.save()
             }
             if (topics[2] === 'checkin') {
                 device.online_status = true

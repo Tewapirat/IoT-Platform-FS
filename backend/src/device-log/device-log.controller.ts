@@ -23,6 +23,18 @@ export class DeviceLogController implements IController {
 
         }
     }
+    public getLogCurrent = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
+            const device_id = req.params.device_id
+            const logs: Log[] = await this.service.getLogCurrent(device_id)
+            res.status(200).json({ message: 'get', data: logs, count: logs.length })
+
+        } catch (error) {
+            next(error)
+
+        }
+    }
+
     public getById = async (req: RequestWithUser, res: Response, next: NextFunction) => {
         try {
             throw new Error("Method not implemented")
@@ -49,9 +61,9 @@ export class DeviceLogController implements IController {
     }
     public delete = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const deleteLog:DeleteLogDto = {...req.body}
+            const deleteLog: DeleteLogDto = { ...req.body }
             const result = await this.service.delete(deleteLog)
-            res.status(200).json({message:'delete', data: result})
+            res.status(200).json({ message: 'delete', data: result })
 
         } catch (error) {
             next(error)

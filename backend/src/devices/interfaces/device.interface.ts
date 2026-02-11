@@ -6,5 +6,6 @@ export interface Device {
     name: string
     online_status:boolean
     active_date:Date
+    data: any
     userId: Types.ObjectId
 }

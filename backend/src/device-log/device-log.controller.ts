@@ -27,7 +27,18 @@ export class DeviceLogController implements IController {
         try {
             const device_id = req.params.device_id
             const logs: Log[] = await this.service.getLogCurrent(device_id)
-            res.status(200).json({ message: 'get', data: logs, count: logs.length })
+            res.status(200).json({ message: 'get-log-current', data: logs, count: logs.length })
+
+        } catch (error) {
+            next(error)
+
+        }
+    }
+    public getLogLast6H = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+        try {
+            const device_id = req.params.device_id
+            const logs: Log[] = await this.service.getLogLast6H(device_id)
+            res.status(200).json({ message: 'get-log-6H', data: logs, count: logs.length })
 
         } catch (error) {
             next(error)

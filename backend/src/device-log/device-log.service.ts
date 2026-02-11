@@ -4,6 +4,7 @@ import { LogModel } from "./schemas/device-log.schema";
 import { Service } from "typedi";
 import { CreateLogDto } from "./dto/create-log.dto";
 import { DeleteLogDto } from "./dto/delete-log.dto";
+import { now } from "mongoose";
 
 
 @Service()
@@ -18,11 +19,11 @@ export class DeviceLogService implements IService {
     async getLogCurrent(id: string): Promise<Log[]> {
         let today = new Date();
         console.log('getLogCurrent > NOW:', today.toLocaleString());
-        let strMonth = `${(today.getMonth() + 1).toString().padStart(2, '0')}`;
-        let strDate = `${today.getDate().toString().padStart(2, '0')}`;
+        let strMonth = `${(today.getUTCMonth() + 1).toString().padStart(2, '0')}`;
+        let strDate = `${today.getUTCDate().toString().padStart(2, '0')}`;
         // ISO Date 2023-11-05T18:59:59.000Z
-        let startDate = `${today.getFullYear()}-${strMonth}-${strDate}T00:00:00.000Z`;
-        let endDate = `${today.getFullYear()}-${strMonth}-${strDate}T23:59:59.000Z`;
+        let startDate = `${today.getUTCFullYear()}-${strMonth}-${strDate}T00:00:00.000Z`;
+        let endDate = `${today.getUTCFullYear()}-${strMonth}-${strDate}T23:59:59.000Z`;
         return await LogModel.aggregate([
             {
                 $match: {
@@ -35,17 +36,62 @@ export class DeviceLogService implements IService {
             },
             {
                 $project: {
-                    label: '$log_date',
+                    label: {
+                        $dateToString: {
+                            date: '$log_date',
+                            timezone: 'Asia/Bangkok',
+                            format: '%Y-%m-%d %H:%M:%S'
+
+                        }
+                    },
                     data: {
                         temperature: '$data.temperature',
                         humidity: '$data.humidity',
                         light: '$data.light',
                         soil: '$data.soil'
                     },
-                    id: '${device_id}',
+                    id: '$device_id',
                 }
             }
         ])
+    }
+
+    async getLogLast6H(id: string): Promise<Log[]> {
+        let end = new Date()
+        let start = new Date(end)
+        start.setHours(start.getHours() - 6)
+        return await LogModel.aggregate([
+            {
+                $match: {
+                    $and: [
+                        { 'log_date': { $gte: start } },
+                        { 'log_date': { $lte: end } },
+                        { 'device_id': { $eq: id } },
+                    ]
+                }
+            },
+            {
+                $project: {
+                    label: {
+                        $dateToString: {
+                            date: '$log_date',
+                            timezone: 'Asia/Bangkok',
+                            format: '%Y-%m-%d %H:%M:%S'
+
+                        }
+                    },
+                    data: {
+                        temperature: '$data.temperature',
+                        humidity: '$data.humidity',
+                        light: '$data.light',
+                        soil: '$data.soil'
+                    },
+                    id: '$device_id',
+                }
+            }
+
+        ])
+
     }
 
     public async create(createLog: CreateLogDto): Promise<Log> {

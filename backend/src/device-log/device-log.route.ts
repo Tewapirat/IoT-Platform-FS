@@ -21,6 +21,7 @@ export class DeviceLogRoute implements Routes{
     private initializeRoutes(){
         this.router.get(`${this.path}/:device_id`, AuthMiddleware, this.controller.get)
         this.router.get(`${this.path}/current/:device_id`,AuthMiddleware, this.controller.getLogCurrent)
+        this.router.get(`${this.path}/last_6h/:device_id`,AuthMiddleware, this.controller.getLogLast6H)
         this.router.delete(`${this.path}`, AuthMiddleware,ValidationMiddleware(DeleteLogDto), this.controller.delete)
     }
 
